@@ -113,7 +113,7 @@ func newBufferFromReader(r io.Reader) ([]byte, error) {
 	}
 
 	length, _, _ := readi32(lengthBytes[:]) // ignore ok since we always have enough bytes to read a length
-	if length < 0 {
+	if length < 5 {
 		return nil, ErrInvalidLength
 	}
 	buffer := make([]byte, length)
@@ -402,6 +402,9 @@ func (d Document) Validate() error {
 	}
 	if int(length) > len(d) {
 		return NewDocumentLengthError(int(length), len(d))
+	}
+	if length < 5 {
+		return ErrInvalidLength
 	}
 	if d[length-1] != 0x00 {
 		return ErrMissingNull
